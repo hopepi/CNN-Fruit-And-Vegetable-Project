@@ -1,3 +1,5 @@
+from logging import fatal
+
 import numpy as np
 import pandas as pd
 from pathlib import Path
@@ -39,6 +41,9 @@ def create_dataframe(directory):
             # Alt dizindeki her görüntü dosyası için
             for img_file in os.listdir(label_dir):
                 if img_file.endswith('.jpg'):  # Sadece .jpg dosyalarını al
+                    filepaths.append(str(label_dir / img_file))  # Dosya yolunu ekle
+                    labels.append(label)  # Etiketi ekle
+                if img_file.endswith('.png'):  # Sadece .jpg dosyalarını al
                     filepaths.append(str(label_dir / img_file))  # Dosya yolunu ekle
                     labels.append(label)  # Etiketi ekle
 
@@ -226,13 +231,13 @@ test_datagen = ImageDataGenerator(
 # Test verilerini değerlendirmek için kullanılacak veri artırma ve normalizasyon işlemi.
 
 test_generator = test_datagen.flow_from_dataframe(
-    dataframe=test_df,
-    x_col='Filepath',
-    y_col='Label',
-    target_size=(150, 150),
-    color_mode='rgb',
-    class_mode='sparse',
-    batch_size=16,
+    dataframe=test_df,             # Test verileri için veri çerçevesi
+    x_col='Filepath',              # Görüntü dosyalarının yollarını tutan sütun
+    y_col='Label',                 # Etiketlerin tutulduğu sütun
+    target_size=(150, 150),        # Her görüntünün yeniden boyutlandırılacağı boyut (150x150 piksel)
+    class_mode='sparse',           # Etiketlerin sparse formatında alınması
+    batch_size=16,                  # Her adımda işlenecek görüntü sayısı
+    color_mode="rgb",
     shuffle=False
 )
 # batch_size: Her bir işlem adımında modelin eğitiminde kullanılacak örnek sayısıdır.
